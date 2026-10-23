@@ -1,0 +1,9 @@
+fastapi==0.143.1
+uvicorn[standard]==0.54.0
+httpx==0.28.1
+icalendar==7.3.0
+recurring-ical-events==3.8.2
+svix==2.8.0
+pydantic-settings==2.16.0
+# The shared invite parser and MeetStream tools, from this repo
+./toolkit

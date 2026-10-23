@@ -1,0 +1,12 @@
+# Lint and format settings for the whole repo, app and toolkit alike.
+line-length = 120
+target-version = "py310"
+
+[lint]
+# pyflakes, pycodestyle, bugbear, import order, modern syntax, async pitfalls
+select = ["E", "F", "W", "B", "I", "UP", "ASYNC"]
+# Long strings and URLs read better unbroken; the formatter wraps code.
+ignore = ["E501"]
+
+[lint.isort]
+known-first-party = ["app", "agentmail_meetstream", "tests"]

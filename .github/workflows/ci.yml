@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # The app needs 3.11+ (pydantic-settings); it's developed on 3.12.
+        python: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - name: Install
+        run: pip install -r requirements-dev.txt "./toolkit[dev]"
+      - name: Lint and format
+        run: |
+          ruff check .
+          ruff format --check .
+      - name: Types
+        run: |
+          mypy app scripts --ignore-missing-imports
+          (cd toolkit && mypy src --ignore-missing-imports)
+      - name: App tests
+        run: pytest
+      - name: Toolkit tests
+        run: cd toolkit && pytest
+
+  toolkit-oldest-python:
+    # The toolkit on its own promises Python 3.10+.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+      - name: Install
+        run: pip install "./toolkit[dev]"
+      - name: Toolkit tests
+        run: cd toolkit && pytest
+
+  docker:
+    # The image builds, starts and answers its health check.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        run: docker build -t agentmail-meetstream .
+      - name: Start and check health
+        run: |
+          docker run -d --name app -p 8000:8000 \
+            -e AGENTMAIL_API_KEY=x -e AGENTMAIL_INBOX_ID=ci@agentmail.to -e MEETSTREAM_API_KEY=x \
+            agentmail-meetstream
+          for i in $(seq 1 20); do curl -fs http://localhost:8000/healthz && exit 0; sleep 1; done
+          docker logs app
+          exit 1
+
+  package:
+    # The toolkit builds into a wheel and sdist with valid package metadata.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Build and check
+        run: |
+          pip install build twine
+          python -m build toolkit
+          twine check --strict toolkit/dist/*
