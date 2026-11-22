@@ -1,0 +1,13 @@
+# docker compose up -d   (reads .env; see docs/deploy.md)
+services:
+  notetaker:
+    build: .
+    env_file: .env
+    ports:
+      - "8000:8000"
+    volumes:
+      - notetaker-data:/data
+    restart: unless-stopped
+
+volumes:
+  notetaker-data:

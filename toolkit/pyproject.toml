@@ -1,0 +1,52 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agentmail-meetstream"
+version = "0.1.0"
+description = "MeetStream meeting tools for AI agents with an AgentMail inbox: join meetings from invite emails, read transcripts, email the notes."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{ name = "MeetStream", email = "hello@meetstream.ai" }]
+keywords = ["agentmail", "meetstream", "ai-agents", "meeting-notes", "notetaker", "zoom", "google-meet", "microsoft-teams", "openai-agents", "langchain"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Communications :: Email",
+    "Topic :: Office/Business :: Scheduling",
+    "Typing :: Typed",
+]
+dependencies = [
+    "agentmail>=2.0",
+    "httpx>=0.27",
+    "icalendar>=6.0",
+    "pydantic>=2.5",
+    "recurring-ical-events>=3.3",
+]
+
+[project.urls]
+Homepage = "https://github.com/meetstream-ai/agentmail-integration"
+Documentation = "https://github.com/meetstream-ai/agentmail-integration/blob/main/toolkit/docs/integrate-meetstream.md"
+Repository = "https://github.com/meetstream-ai/agentmail-integration"
+Issues = "https://github.com/meetstream-ai/agentmail-integration/issues"
+Changelog = "https://github.com/meetstream-ai/agentmail-integration/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+openai = ["openai-agents>=0.6"]
+langchain = ["langchain>=1.1"]
+# The example agent; agentmail-toolkit needs Python 3.11+, the package itself 3.10+.
+example = ["openai-agents>=0.6", "agentmail-toolkit>=0.3"]
+dev = ["pytest>=8.0", "respx>=0.21", "openai-agents>=0.6", "langchain>=1.1"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/agentmail_meetstream"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
